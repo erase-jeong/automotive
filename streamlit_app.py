@@ -9,9 +9,9 @@ st.caption("this is the caption")
 st.code("x=2021")
 st.latex(r'''a+ar^1+ar^2+ar^3''')
 
-st.image("kk.jpg")
-st.audio("audio.mp3")
-st.video("video.mp4")
+st.image("kk.png")
+#st.audio("audio.mp3")
+#st.video("video.mp4")
 
 st.checkbox('yes')
 st.button('Click')
