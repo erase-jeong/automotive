@@ -32,7 +32,7 @@ st.color_picker('Choose your favorite color')
 
 
 st.sidebar.title("This is written inside the sidebar")
-st.sidebar.button("Click")
+st.sidebar.button("Clic")
 st.sidebar.radio("Pick your gender",["Male","Female"])
 
 
