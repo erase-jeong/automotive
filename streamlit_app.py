@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import mayplotlib.pyplot as plt
 
 st.title('this is the app title')
 st.header("this is the markdown")
@@ -39,6 +40,13 @@ st.sidebar.radio("Pick your gender",["Male","Female"], key=3)
 container=st.container()
 container.write("This is written inside the container")
 st.write("This is written outside the container")
+
+
+rand=np.random.noraml(1,2,size=20)
+fig,ax=plt.subplots()
+ax.hist(rand,bins=15)
+st.pyplot(fig)
+
 
 	
 st.title('Uber pickups in NYC')
