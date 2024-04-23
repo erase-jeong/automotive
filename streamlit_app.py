@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import mayplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 st.title('this is the app title')
 st.header("this is the markdown")
