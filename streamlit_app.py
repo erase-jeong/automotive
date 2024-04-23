@@ -1,6 +1,13 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+
+st.title('this is the app title')
+st.header("this is the markdown")
+st.subheader("the subheader")
+st.caption("this is the caption")
+st.code("x=2021")
+st.latex(r'''a+ar^1+ar^2+ar^3''')
 	
 st.title('Uber pickups in NYC')
 	
