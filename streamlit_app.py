@@ -36,6 +36,9 @@ st.sidebar.button("Click", key="2")
 st.sidebar.radio("Pick your gender",["Male","Female"], key=3)
 
 
+container=st.container()
+container.write("This is written inside the container")
+st.write("This is written outside the container")
 
 	
 st.title('Uber pickups in NYC')
