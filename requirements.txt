@@ -4,3 +4,4 @@ numpy
 Matplotlib
 seaborn
 openpyxl
+fontconfig

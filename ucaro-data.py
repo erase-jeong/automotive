@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib import font_manager, rc
 
+plt.matplotlib.use('Agg')
+
 # Heroku 포트 설정 추가
 port = os.environ.get("PORT", 8501)
 
