@@ -6,4 +6,3 @@ seaborn
 openpyxl
 folium
 geopy
-folium_static

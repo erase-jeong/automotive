@@ -9,7 +9,7 @@ import matplotlib.font_manager as fm
 import folium
 from geopy.geocoders import Nominatim
 from folium import Map, Marker
-from streamlit_folium import folium_static
+
 
 
 plt.matplotlib.use('Agg')
