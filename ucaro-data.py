@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib import font_manager, rc
+import matplotlib.font_manager as fm
 
 plt.matplotlib.use('Agg')
 
@@ -153,8 +154,11 @@ elif option == "폭스바겐":
     #font_path = os.path.join("data", "MALGUN.TTF")
 
     font_path = 'fonts/MALGUN.TTF'  # 폰트 경로 설정
-    font = font_manager.FontProperties(fname=font_path).get_name()
-    rc('font', family=font)
+    font_prop = fm.FontProperties(fname=font_path)
+    # 전역 폰트 설정
+    plt.rcParams['font.family'] = font_prop.get_name()
+    #font = font_manager.FontProperties(fname=font_path).get_name()
+    #rc('font', family=font)
 
 
     df['지점명'] = df['지점명'].replace({
