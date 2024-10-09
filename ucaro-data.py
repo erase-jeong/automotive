@@ -478,6 +478,105 @@ if option == "아우디":
             st.pyplot(fig)
 
             st.dataframe(address_count_df, use_container_width=True)
+    
+    with tab3:
+    
+
+        #st.header("<아우디>")
+
+    
+        #st.text("") 
+        #st.header("지점 분포현황")
+        #st.write("- 남천 1, 남천 2는 남천으로, 해운대1, 해운대2는 해운대로 통합 \n- 선등록, AAP, HQ, MAL 라고 되어있는 지점데이터는 제외")
+
+        # 엑셀 파일 경로 설정
+        file_path = 'data/audi_full.xlsx'
+        # 엑셀 파일 읽기
+        df = pd.read_excel(file_path)
+
+        st.text(df)
+
+
+        #font_path = os.path.join("data", "MALGUN.TTF")  # 데이터 폴더 내의 폰트 파일 경로
+
+        font_path = 'fonts/MALGUN.TTF'  # 폰트 경로 설정
+        font = font_manager.FontProperties(fname=font_path).get_name()
+        rc('font', family=font)
+
+
+
+        # 2. 지점명 통합 (남천1, 남천2는 남천으로 / 해운대1, 해운대2는 해운대로)
+        df['지점명'] = df['지점명'].replace({
+            '남천1': '남천', '남천2': '남천',
+            '해운대1': '해운대', '해운대2': '해운대'
+        })
+
+        # 3. 제외할 지점 제거 (선등록, AAP, HQ, MAL 제거)
+        df = df[~df['지점명'].isin(['선등록', 'AAP', 'HQ', 'MAL'])]
+
+        # 4. 지점별로 개수 카운트
+        branch_count = df['지점명'].value_counts()
+
+        # 데이터프레임으로 변환
+        branch_count_df = branch_count.reset_index()
+        branch_count_df.columns = ['지점명', '고객 수']  # 열 이름 변경
+        # 5. 전체 고객 수 계산
+        total_customers = branch_count.sum()
+
+ # 지점 선택을 위한 드롭다운 메뉴
+        selected_branch = st.selectbox('지점을 선택하세요:', df['지점명'].unique(), key='branch_select')
+
+        # 선택된 지점에 해당하는 데이터 필터링
+        selected_df = df[df['지점명'] == selected_branch]
+
+        # 데이터를 DataFrame으로 변환
+        age_gender = pd.DataFrame(selected_df, columns=['성별/연령'])
+
+        # 슬래시를 기준으로 성별과 연령 분리
+        df[['성별', '연령']] = df['성별/연령'].str.split('/', expand=True)
+
+        # 최종 결과
+        st.text(df[['성별', '연령']])
+
+        # 주소에서 첫 번째 부분(도시 또는 시, 구 등) 추출
+        selected_df['거주지'] = selected_df['주소'].apply(lambda x: str(x).split()[0])
+
+        # 거주지별로 카운트
+        address_count = selected_df['거주지'].value_counts()
+
+        # 선택된 지점 거주지 분포 데이터 정리
+        address_count_df = pd.DataFrame(address_count).reset_index()
+        address_count_df.columns = ['거주지', '카운트']
+
+        # 전체 고객 수 계산
+        total_customers = address_count_df['카운트'].sum()
+
+        # 각 거주지별 비율 계산
+        address_count_df['비율 (%)'] = (address_count_df['카운트'] / total_customers) * 100
+
+
+        # 시각화 (막대 그래프) - 비율 표시 추가
+        st.subheader(f'{selected_branch} 지점 고객 거주지 분포 및 비율')
+
+        # 그래프 그리기
+        fig, ax = plt.subplots(figsize=(12, 6))
+        sns.barplot(x=address_count_df['거주지'], y=address_count_df['카운트'], palette="Blues_d", ax=ax)
+
+        # 막대 위에 비율 표시
+        for index, value in enumerate(address_count_df['카운트']):
+            ax.text(index, value + 10, f"{address_count_df['비율 (%)'].iloc[index]:.2f}%", ha='center')
+
+        ax.set_title(f'{selected_branch} 지점 고객 거주지 분포 및 비율')
+        ax.set_xlabel('거주지')
+        ax.set_ylabel('고객 수')
+        ax.set_xticks(range(len(address_count_df)))
+        ax.set_xticklabels(address_count_df['거주지'], rotation=45)
+
+        # 그래프를 Streamlit에 표시
+        st.pyplot(fig)
+
+
+
 
 
 
