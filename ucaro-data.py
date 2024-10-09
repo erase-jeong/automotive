@@ -28,7 +28,7 @@ if option == "아우디":
     # 엑셀 파일 읽기
     df = pd.read_excel(file_path)
 
-    font_path = 'font/malgun.ttf'  # 폰트 경로 설정
+    font_path = 'font/MALGUN.TTF'  # 폰트 경로 설정
     font = font_manager.FontProperties(fname=font_path).get_name()
     rc('font', family=font)
 
@@ -145,7 +145,7 @@ elif option == "폭스바겐":
     # 엑셀 파일 읽기
     df = pd.read_excel(file_path)
 
-    font_path = 'font/malgun.ttf'  # 폰트 경로 설정
+    font_path = 'font/MALGUN.TT'  # 폰트 경로 설정
     font = font_manager.FontProperties(fname=font_path).get_name()
     rc('font', family=font)
 
