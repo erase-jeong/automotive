@@ -33,7 +33,7 @@ if option == "아우디":
 
     #font_path = os.path.join("data", "MALGUN.TTF")  # 데이터 폴더 내의 폰트 파일 경로
 
-    font_path = 'font/MALGUN.TTF'  # 폰트 경로 설정
+    font_path = 'fonts/MALGUN.TTF'  # 폰트 경로 설정
     font = font_manager.FontProperties(fname=font_path).get_name()
     rc('font', family=font)
 
@@ -152,7 +152,7 @@ elif option == "폭스바겐":
 
     #font_path = os.path.join("data", "MALGUN.TTF")
 
-    font_path = 'font/MALGUN.TTF'  # 폰트 경로 설정
+    font_path = 'fonts/MALGUN.TTF'  # 폰트 경로 설정
     font = font_manager.FontProperties(fname=font_path).get_name()
     rc('font', family=font)
 
