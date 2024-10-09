@@ -1,1 +1,1 @@
-web: streamlit run streamlit_new.py --server.port $PORT
+web: streamlit run ucaro-data.py --server.port $PORT
