@@ -148,7 +148,9 @@ elif option == "폭스바겐":
     # 엑셀 파일 읽기
     df = pd.read_excel(file_path)
 
-    font_path = 'font/MALGUN.TTF'  # 폰트 경로 설정
+    font_path = os.path.join("data", "MALGUN.TTF")
+
+    #font_path = 'font/MALGUN.TTF'  # 폰트 경로 설정
     font = font_manager.FontProperties(fname=font_path).get_name()
     rc('font', family=font)
 
@@ -182,9 +184,9 @@ elif option == "폭스바겐":
         percentage = (value / total_customers) * 100
         ax.text(index, value + 10, f"{percentage:.2f}%", ha='center')
 
-    ax.set_title('지점별 분포현황')
-    ax.set_xlabel('지점명')
-    ax.set_ylabel('판매 개수')
+    plt.title('지점별 분포현황')
+    plt.xlabel('지점명')
+    plt.ylabel('판매 개수')
     ax.set_xticks(range(len(branch_count)))
     ax.set_xticklabels(branch_count.index, rotation=45)
 
@@ -238,9 +240,9 @@ elif option == "폭스바겐":
     for index, value in enumerate(address_count_df['카운트']):
         ax.text(index, value + 10, f"{address_count_df['비율 (%)'].iloc[index]:.2f}%", ha='center')
 
-    ax.set_title(f'{selected_branch} 지점 고객 거주지 분포 및 비율')
-    ax.set_xlabel('거주지')
-    ax.set_ylabel('고객 수')
+    plt.title(f'{selected_branch} 지점 고객 거주지 분포 및 비율')
+    plt.xlabel('거주지')
+    plt.ylabel('고객 수')
     ax.set_xticks(range(len(address_count_df)))
     ax.set_xticklabels(address_count_df['거주지'], rotation=45)
 
