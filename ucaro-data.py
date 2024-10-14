@@ -9,6 +9,7 @@ import matplotlib.font_manager as fm
 import folium
 from geopy.geocoders import Nominatim
 from folium import Map, Marker
+import re
 
 
 
@@ -20,7 +21,7 @@ port = os.environ.get("PORT", 8501)
 st.title('지점데이터 분석')
 
 # 탭 메뉴
-tab1, tab2,tab3= st.tabs(["지점 분포현황","지점별 고객 거주지", "지점별 고객성별&연령"])
+tab1, tab2,tab3,tab4= st.tabs(["지점 분포현황","지점별 고객 거주지", "지점별 고객성별&연령","지점별 판매차종"])
 
 
 
@@ -37,7 +38,7 @@ option = st.sidebar.radio("카테고리", ["아우디", "폭스바겐"], key=3)
 if option == "아우디":
 
     with tab1:
-        st.header("지점 분포현황")
+        st.header("아우디 지점 분포현황")
         st.write("- 남천 1, 남천 2는 남천으로, 해운대1, 해운대2는 해운대로 통합 \n- 선등록, AAP, HQ, MAL 라고 되어있는 지점데이터는 제외")
 
         # 엑셀 파일 경로 설정
@@ -172,7 +173,7 @@ if option == "아우디":
         #st.divider() 
 
 
-        st.header("지점별 고객 거주지 분포현황")
+        st.header("아우디 지점별 고객 거주지 분포현황")
 
 
 
@@ -480,7 +481,7 @@ if option == "아우디":
 
             
         with tab3:
-            st.header("고객성별&연령")
+            st.header("아우디 고객성별&연령")
             #st.write("여기에 아우디 페이지 내용을 추가하세요.")
 
         # 성별과 연령을 분리
@@ -577,6 +578,84 @@ if option == "아우디":
             st.table(age_df)
 
 
+        with tab4:
+            st.header("아우디 지점별 판매차종")
+
+            # 모델명에서 괄호와 그 안의 내용을 제거하는 함수
+            def clean_model(model):
+                # 괄호와 그 안의 내용 제거
+                model_without_brackets = re.sub(r'\(.*?\)', '', model).strip()
+                # 첫 번째 단어만 남기기
+                return model_without_brackets.split()[0].strip()
+
+            # 모델 데이터를 가공하여 괄호 내용 제거
+            selected_df['모델'] = selected_df['모델'].apply(clean_model)
+
+            # 모델별 판매대수를 필터링하여 그룹화
+            model_count = selected_df['모델'].value_counts()  # 모델별 판매대수
+            total_sales = model_count.sum()  # 전체 판매대수
+            model_percentage = (model_count / total_sales) * 100  # 각 모델별 판매 비율
+
+            # 버튼을 눌렀을 때 전체 지점 통합 모델 판매대수를 보여줌
+            if st.button('전체 지점 모델 판매대수 보기'):
+                total_model_count = model_count  # 전체 지점의 모델별 판매대수
+
+                st.subheader('전체 지점 모델별 판매대수 (비율)')
+                fig_total_model, ax_total_model = plt.subplots(figsize=(6, 4))
+                sns.barplot(x=total_model_count.index, y=model_percentage.values, palette="Blues_d", ax=ax_total_model)
+
+                # 막대 위에 판매비율 텍스트 추가
+                for i, value in enumerate(model_percentage.values):
+                    ax_total_model.text(i, value + 1, f'{value:.2f}%', ha='center')
+
+                ax_total_model.set_xlabel('모델')
+                ax_total_model.set_ylabel('판매 비율 (%)')
+                ax_total_model.set_title('전체 지점 모델별 판매 비율')
+                st.pyplot(fig_total_model)
+
+                # 전체 지점 모델별 판매대수 및 비율 테이블 출력
+                total_model_df = pd.DataFrame({
+                    '모델': total_model_count.index,
+                    '판매대수': [f'{int(value)}대' for value in total_model_count.values],
+                    '비율 (%)': [f'{value:.2f}%' for value in model_percentage.values]
+                })
+                st.dataframe(total_model_df, use_container_width=True)
+
+            st.write("") 
+            st.write("") 
+            # 지점 선택을 위한 드롭다운 메뉴 (고유한 key 부여)
+            selected_branch3 = st.selectbox('지점을 선택하세요:', df['지점명'].unique(), key="selectbox4")
+
+            # 지점별 필터링 (선택한 지점에 해당하는 데이터만 필터링)
+            filtered_df = selected_df[selected_df['지점명'] == selected_branch3]
+
+            # 모델별 판매대수 및 비율 재계산
+            model_count_filtered = filtered_df['모델'].value_counts()
+            total_sales_filtered = model_count_filtered.sum()
+            model_percentage_filtered = (model_count_filtered / total_sales_filtered) * 100
+
+            # 모델별 판매대수 시각화 (비율로 변경)
+            st.subheader(f'{selected_branch3} 지점 모델별 판매 비율')
+            fig_model, ax_model = plt.subplots(figsize=(6, 4))
+            sns.barplot(x=model_count_filtered.index, y=model_percentage_filtered.values, palette="Blues_d", ax=ax_model)
+
+            # 막대 위에 비율 텍스트 추가
+            for i, value in enumerate(model_percentage_filtered.values):
+                ax_model.text(i, value + 1, f'{value:.2f}%', ha='center')
+
+            ax_model.set_xlabel('모델')
+            ax_model.set_ylabel('판매 비율 (%)')
+            ax_model.set_title(f'{selected_branch3} 지점 모델별 판매 비율')
+            st.pyplot(fig_model)
+
+            # 모델별 판매대수 및 비율 테이블 출력
+            model_df_filtered = pd.DataFrame({
+                '모델': model_count_filtered.index,
+                '판매대수': [f'{int(value)}대' for value in model_count_filtered.values],
+                '비율 (%)': [f'{value:.2f}%' for value in model_percentage_filtered.values]
+            })
+            st.dataframe(model_df_filtered, use_container_width=True)       
+
 
 
 
@@ -589,7 +668,7 @@ if option == "아우디":
 elif option == "폭스바겐":
 
     with tab1:
-        st.header("지점 분포현황")
+        st.header("폭스바겐 지점 분포현황")
         st.write("- 창원1, 창원2 지점 창원으로 통합\n - 선등록, AAP, HQ, MAL, VMA 제외")
 
         # 엑셀 파일 경로 설정
@@ -721,7 +800,7 @@ elif option == "폭스바겐":
         #st.divider() 
 
 
-        st.header("지점별 고객 거주지 분포현황")
+        st.header("폭스바겐 지점별 고객 거주지 분포현황")
 
 
 
@@ -1025,7 +1104,7 @@ elif option == "폭스바겐":
 
 
         with tab3:
-            st.header("고객성별&연령")
+            st.header("폭스바겐 고객성별&연령")
             #st.write("여기에 아우디 페이지 내용을 추가하세요.")
 
         # 성별과 연령을 분리
@@ -1120,4 +1199,84 @@ elif option == "폭스바겐":
                 '비율': [f'{value:.2f}%' for value in age_group_count.values]
             })
             st.table(age_df)
+
+
+        with tab4:
+            st.header("폭스바겐 지점별 판매차종")
+
+            # 모델명에서 괄호와 그 안의 내용을 제거하는 함수
+            def clean_model(model):
+                # 괄호와 그 안의 내용 제거
+                model_without_brackets = re.sub(r'\(.*?\)', '', model).strip()
+                # 첫 번째 단어만 남기기
+                return model_without_brackets.split()[0].strip()
+
+            # 모델 데이터를 가공하여 괄호 내용 제거
+            selected_df['모델'] = selected_df['모델'].apply(clean_model)
+
+            # 모델별 판매대수를 필터링하여 그룹화
+            model_count = selected_df['모델'].value_counts()  # 모델별 판매대수
+            total_sales = model_count.sum()  # 전체 판매대수
+            model_percentage = (model_count / total_sales) * 100  # 각 모델별 판매 비율
+
+            # 버튼을 눌렀을 때 전체 지점 통합 모델 판매대수를 보여줌
+            if st.button('전체 지점 모델 판매대수 보기'):
+                total_model_count = model_count  # 전체 지점의 모델별 판매대수
+
+                st.subheader('전체 지점 모델별 판매대수 (비율)')
+                fig_total_model, ax_total_model = plt.subplots(figsize=(6, 4))
+                sns.barplot(x=total_model_count.index, y=model_percentage.values, palette="Blues_d", ax=ax_total_model)
+
+                # 막대 위에 판매비율 텍스트 추가
+                for i, value in enumerate(model_percentage.values):
+                    ax_total_model.text(i, value + 1, f'{value:.2f}%', ha='center')
+
+                ax_total_model.set_xlabel('모델')
+                ax_total_model.set_ylabel('판매 비율 (%)')
+                ax_total_model.set_title('전체 지점 모델별 판매 비율')
+                st.pyplot(fig_total_model)
+
+                # 전체 지점 모델별 판매대수 및 비율 테이블 출력
+                total_model_df = pd.DataFrame({
+                    '모델': total_model_count.index,
+                    '판매대수': [f'{int(value)}대' for value in total_model_count.values],
+                    '비율 (%)': [f'{value:.2f}%' for value in model_percentage.values]
+                })
+                st.dataframe(total_model_df, use_container_width=True)
+
+            st.write("") 
+            st.write("") 
+            # 지점 선택을 위한 드롭다운 메뉴 (고유한 key 부여)
+            selected_branch3 = st.selectbox('지점을 선택하세요:', df['지점명'].unique(), key="selectbox4")
+
+            # 지점별 필터링 (선택한 지점에 해당하는 데이터만 필터링)
+            filtered_df = selected_df[selected_df['지점명'] == selected_branch3]
+
+            # 모델별 판매대수 및 비율 재계산
+            model_count_filtered = filtered_df['모델'].value_counts()
+            total_sales_filtered = model_count_filtered.sum()
+            model_percentage_filtered = (model_count_filtered / total_sales_filtered) * 100
+
+            # 모델별 판매대수 시각화 (비율로 변경)
+            st.subheader(f'{selected_branch3} 지점 모델별 판매 비율')
+            fig_model, ax_model = plt.subplots(figsize=(6, 4))
+            sns.barplot(x=model_count_filtered.index, y=model_percentage_filtered.values, palette="Blues_d", ax=ax_model)
+
+            # 막대 위에 비율 텍스트 추가
+            for i, value in enumerate(model_percentage_filtered.values):
+                ax_model.text(i, value + 1, f'{value:.2f}%', ha='center')
+
+            ax_model.set_xlabel('모델')
+            ax_model.set_ylabel('판매 비율 (%)')
+            ax_model.set_title(f'{selected_branch3} 지점 모델별 판매 비율')
+            st.pyplot(fig_model)
+
+            # 모델별 판매대수 및 비율 테이블 출력
+            model_df_filtered = pd.DataFrame({
+                '모델': model_count_filtered.index,
+                '판매대수': [f'{int(value)}대' for value in model_count_filtered.values],
+                '비율 (%)': [f'{value:.2f}%' for value in model_percentage_filtered.values]
+            })
+            st.dataframe(model_df_filtered, use_container_width=True)       
+
 
